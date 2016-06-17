@@ -1,0 +1,7 @@
+src/main/resources/tpgkey
+.project
+.classpath
+.settings/
+target
+temp
+${env:CONFIGURATION_FOLDER}
