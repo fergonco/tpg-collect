@@ -94,7 +94,7 @@ public class ThermometerMonitor {
 			public void run() {
 				monitor();
 			}
-		}, CHECK_PAUSE);
+		}, checkPause);
 	}
 
 }
