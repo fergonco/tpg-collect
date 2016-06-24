@@ -30,9 +30,9 @@ public class DayFrame {
 	}
 
 	public long getWaitingMSUntilTomorrow() {
-		long now = new Date().getTime();
+		long now = dateProvider.getNow();
 		long currentOffset = now % (1000 * 60 * 60 * 24);
-		return endOffset - currentOffset;
+		return startOffset - currentOffset;
 	}
 
 	interface DateProvider {

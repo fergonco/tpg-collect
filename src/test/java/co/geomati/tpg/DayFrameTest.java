@@ -46,4 +46,15 @@ public class DayFrameTest {
 				27 * 60 * 60 * 1000, dateProvider);
 		assertEquals(24 * 60 * 60 * 1000, dayFrame.getCurrentDay().getTime());
 	}
+
+	@Test
+	public void millisUntilNextDay() throws Exception {
+		DateProvider dateProvider = mock(DayFrame.DateProvider.class);
+		when(dateProvider.getNow()).thenReturn(27 * 60 * 60 * 1000L + 1);
+		DayFrame dayFrame = new DayFrame(4 * 60 * 60 * 1000,
+				27 * 60 * 60 * 1000, dateProvider);
+
+		System.out.println(dayFrame.getWaitingMSUntilTomorrow());
+		assertEquals(3599999, dayFrame.getWaitingMSUntilTomorrow());
+	}
 }
