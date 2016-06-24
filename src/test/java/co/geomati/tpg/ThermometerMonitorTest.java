@@ -71,6 +71,19 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
+	public void retryInitIfFailure() throws IOException, SAXException,
+			ParseException {
+		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));
+		doThrow(new NullPointerException()).doNothing().when(comparator).init();
+
+		monitor.monitor();
+		monitor.monitor();
+
+		verify(comparator, times(2)).init();
+		verify(comparator, times(1)).check();
+	}
+
+	@Test
 	public void testDayAlreadyStarted() throws IOException, SAXException,
 			ParseException {
 		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));

@@ -57,18 +57,18 @@ public class ThermometerMonitor {
 						thermometerComparator.init();
 					}
 				}
+				working = true;
+				for (ThermometerComparator thermometerComparator : thermometerComparators) {
+					try {
+						thermometerComparator.check();
+					} catch (RuntimeException e) {
+						logger.error("Error comparing thermometers", e);
+					}
+				}
 			} catch (Exception e) {
 				logger.debug("Problem initializing thermometers", e);
 				working = false;
 			}
-			for (ThermometerComparator thermometerComparator : thermometerComparators) {
-				try {
-					thermometerComparator.check();
-				} catch (RuntimeException e) {
-					logger.error("Error comparing thermometers", e);
-				}
-			}
-			working = true;
 		}
 		wakeMe(wait);
 	}
