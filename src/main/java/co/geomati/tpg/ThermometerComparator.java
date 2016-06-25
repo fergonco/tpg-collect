@@ -29,7 +29,7 @@ public class ThermometerComparator {
 	private String firstStop;
 	private String destination;
 	private ThermometerStart[] thermometerStarts;
-	private HashMap<String, Thermometer> departureThermometer = new HashMap<String, Thermometer>();
+	private HashMap<String, Thermometer> departureThermometer;
 
 	public ThermometerComparator(DayFrame dayFrame, TPGCachedParser tpg,
 			ThermometerArchiver archiver, String line, String firstStop,
@@ -51,6 +51,7 @@ public class ThermometerComparator {
 	public void init() throws IOException, SAXException, ParseException {
 		thermometerStarts = tpg.getStopDepartures(dayFrame.getCurrentDay(),
 				line, firstStop, destination);
+		departureThermometer = new HashMap<String, Thermometer>();
 		for (ThermometerStart start : thermometerStarts) {
 			Thermometer thermometer = tpg.getThermometer(start
 					.getDepartureCode());

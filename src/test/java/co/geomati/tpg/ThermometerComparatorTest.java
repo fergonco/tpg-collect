@@ -156,4 +156,11 @@ public class ThermometerComparatorTest {
 				eq(referenceThermometer));
 	}
 
+	@Test
+	public void initOkAfterClear() throws IOException, SAXException,
+			ParseException {
+		comparator.clear();
+		comparator.init();
+	}
+
 }
