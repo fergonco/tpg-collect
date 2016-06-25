@@ -37,40 +37,44 @@ public class ThermometerMonitor {
 	}
 
 	public void monitor() {
-		weatherArchiver.archive();
-		logHumamReadable();
-		long wait;
-		Date day = dayFrame.getCurrentDay();
-		if (day == null) {
-			if (working) {
-				for (ThermometerComparator thermometerComparator : thermometerComparators) {
-					thermometerComparator.clear();
-				}
-			}
-			wait = dayFrame.getWaitingMSUntilTomorrow();
-			working = false;
-		} else {
-			wait = CHECK_PAUSE;
-			try {
-				if (!working) {
+		long wait = CHECK_PAUSE;
+		try {
+			weatherArchiver.archive();
+			logHumamReadable();
+			Date day = dayFrame.getCurrentDay();
+			if (day == null) {
+				if (working) {
 					for (ThermometerComparator thermometerComparator : thermometerComparators) {
-						thermometerComparator.init();
+						thermometerComparator.clear();
 					}
 				}
-				working = true;
-				for (ThermometerComparator thermometerComparator : thermometerComparators) {
-					try {
-						thermometerComparator.check();
-					} catch (RuntimeException e) {
-						logger.error("Error comparing thermometers", e);
-					}
-				}
-			} catch (Exception e) {
-				logger.debug("Problem initializing thermometers", e);
+				wait = dayFrame.getWaitingMSUntilTomorrow();
 				working = false;
+			} else {
+				try {
+					if (!working) {
+						for (ThermometerComparator thermometerComparator : thermometerComparators) {
+							thermometerComparator.init();
+						}
+					}
+					working = true;
+					for (ThermometerComparator thermometerComparator : thermometerComparators) {
+						try {
+							thermometerComparator.check();
+						} catch (RuntimeException e) {
+							logger.error("Error comparing thermometers", e);
+						}
+					}
+				} catch (Exception e) {
+					logger.debug("Problem initializing thermometers", e);
+					working = false;
+				}
 			}
+		} catch (RuntimeException e) {
+			logger.error("unexpected error", e);
+		} finally {
+			wakeMe(wait);
 		}
-		wakeMe(wait);
 	}
 
 	private void logHumamReadable() {
