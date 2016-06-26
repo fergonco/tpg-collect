@@ -36,6 +36,7 @@ public class TPG {
 			String ret = IOUtils.toString(new URI(url),
 					Charset.forName("utf-8"));
 			logger.debug("ok");
+			logger.debug(ret);
 			return ret;
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("Bug: Malformed URI", e);

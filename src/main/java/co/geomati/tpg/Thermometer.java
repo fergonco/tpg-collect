@@ -6,7 +6,13 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Thermometer {
+
+	private final static Logger logger = LogManager
+			.getLogger(Thermometer.class);
 
 	private LinkedHashMap<String, Step> steps = new LinkedHashMap<String, Step>();
 	private boolean done;
@@ -33,14 +39,20 @@ public class Thermometer {
 				.getStepDepartureCodes();
 		for (String departureCode : updatedDepartureCodes) {
 			Step plannedStep = steps.get(departureCode);
-			Step updatedStep = updatedThermometer.steps.get(departureCode);
+			if (plannedStep != null) {
+				Step updatedStep = updatedThermometer.steps.get(departureCode);
 
-			if (updatedStep.getTimestamp() < now) {
-				if (plannedStep.getActualTimestamp() != updatedStep
-						.getTimestamp()) {
-					plannedStep.setActualTimestamp(updatedStep.getTimestamp());
-					effectiveUpdate = true;
+				if (updatedStep.getTimestamp() < now) {
+					if (plannedStep.getActualTimestamp() != updatedStep
+							.getTimestamp()) {
+						plannedStep.setActualTimestamp(updatedStep
+								.getTimestamp());
+						effectiveUpdate = true;
+					}
 				}
+			} else {
+				logger.error("Inconsistency between planned steps and update: "
+						+ departureCode);
 			}
 		}
 
