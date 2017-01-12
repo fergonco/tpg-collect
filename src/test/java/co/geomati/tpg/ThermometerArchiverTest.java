@@ -30,7 +30,7 @@ public class ThermometerArchiverTest {
 		steps.add(step);
 		Thermometer thermometer = new Thermometer(steps);
 
-		ThermometerArchiver archiver = new ThermometerArchiver(folder);
+		ThermometerArchiver archiver = new ThermometerArchiverImpl(folder);
 		archiver.archive("Y", "FEMA", "VAL-THOIRY", thermometer);
 
 		String thermometerContent = IOUtils.toString(

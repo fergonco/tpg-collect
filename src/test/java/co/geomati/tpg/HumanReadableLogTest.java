@@ -13,7 +13,7 @@ public class HumanReadableLogTest {
 
 	@Test
 	public void testWrite() throws IOException {
-		HumanReadableLog log = new HumanReadableLog(new File("target/temp"));
+		HumanReadableLogImpl log = new HumanReadableLogImpl(new File("target/temp"));
 		log.getLogFile().delete();
 		List<Thermometer> thermometers = new ArrayList<Thermometer>();
 		Thermometer thermometer = new Thermometer(getSteps());

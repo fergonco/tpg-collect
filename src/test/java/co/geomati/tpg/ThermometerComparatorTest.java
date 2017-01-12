@@ -25,7 +25,7 @@ public class ThermometerComparatorTest {
 
 	private DayFrame dayFrame;
 	private TPGCachedParser tpg;
-	private ThermometerArchiver archiver;
+	private ThermometerArchiverImpl archiver;
 	private ThermometerComparator comparator;
 	private ThermometerStart start;
 	private String departureCode;
@@ -36,7 +36,7 @@ public class ThermometerComparatorTest {
 	public void setup() throws IOException, SAXException, ParseException {
 		dayFrame = mock(DayFrame.class);
 		tpg = mock(TPGCachedParser.class);
-		archiver = mock(ThermometerArchiver.class);
+		archiver = mock(ThermometerArchiverImpl.class);
 		comparator = new ThermometerComparator(dayFrame, tpg, archiver, "18",
 				"CERN", "BLANCHE");
 

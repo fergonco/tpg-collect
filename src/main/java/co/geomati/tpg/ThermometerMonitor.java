@@ -10,8 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ThermometerMonitor {
-	private final static Logger logger = LogManager
-			.getLogger(ThermometerMonitor.class);
+	private final static Logger logger = LogManager.getLogger(ThermometerMonitor.class);
 
 	/*
 	 * Thermometers are considered done when they are complete and they don't
@@ -26,10 +25,10 @@ public class ThermometerMonitor {
 	private WeatherArchiver weatherArchiver;
 	private HumanReadableLog hrLog;
 	private boolean working = false;
+	private Timer waitingTimer;
 
-	public ThermometerMonitor(DayFrame dayFrame,
-			ThermometerComparator[] comparators,
-			WeatherArchiver weatherArchiver, HumanReadableLog hrLog) {
+	public ThermometerMonitor(DayFrame dayFrame, ThermometerComparator[] comparators, WeatherArchiver weatherArchiver,
+			HumanReadableLog hrLog) {
 		this.dayFrame = dayFrame;
 		this.thermometerComparators = comparators;
 		this.weatherArchiver = weatherArchiver;
@@ -90,15 +89,19 @@ public class ThermometerMonitor {
 	}
 
 	private void wakeMe(long checkPause) {
-		Timer t = new Timer(false);
+		waitingTimer = new Timer(false);
 		logger.debug("Waiting " + checkPause + " ms until the next wake up");
-		t.schedule(new TimerTask() {
+		waitingTimer.schedule(new TimerTask() {
 
 			@Override
 			public void run() {
 				monitor();
 			}
 		}, checkPause);
+	}
+
+	public void stop() {
+		waitingTimer.cancel();
 	}
 
 }

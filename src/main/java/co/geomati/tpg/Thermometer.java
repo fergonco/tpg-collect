@@ -11,12 +11,12 @@ import org.apache.logging.log4j.Logger;
 
 public class Thermometer {
 
-	private final static Logger logger = LogManager
-			.getLogger(Thermometer.class);
+	private final static Logger logger = LogManager.getLogger(Thermometer.class);
 
 	private LinkedHashMap<String, Step> steps = new LinkedHashMap<String, Step>();
 	private boolean done;
 	private ThermometerMetadata metadata;
+	private ThermometerListener listener;
 
 	public Thermometer(ArrayList<Step> steps) {
 		for (Step step : steps) {
@@ -35,24 +35,21 @@ public class Thermometer {
 	public boolean update(Thermometer updatedThermometer) {
 		boolean effectiveUpdate = false;
 		long now = new Date().getTime();
-		Set<String> updatedDepartureCodes = updatedThermometer
-				.getStepDepartureCodes();
+		Set<String> updatedDepartureCodes = updatedThermometer.getStepDepartureCodes();
 		for (String departureCode : updatedDepartureCodes) {
 			Step plannedStep = steps.get(departureCode);
 			if (plannedStep != null) {
 				Step updatedStep = updatedThermometer.steps.get(departureCode);
 
 				if (updatedStep.getTimestamp() < now) {
-					if (plannedStep.getActualTimestamp() != updatedStep
-							.getTimestamp()) {
-						plannedStep.setActualTimestamp(updatedStep
-								.getTimestamp());
+					if (plannedStep.getActualTimestamp() != updatedStep.getTimestamp()) {
+						plannedStep.setActualTimestamp(updatedStep.getTimestamp());
+						listener.stepActualTimestampChanged(plannedStep);
 						effectiveUpdate = true;
 					}
 				}
 			} else {
-				logger.error("Inconsistency between planned steps and update: "
-						+ departureCode);
+				logger.error("Inconsistency between planned steps and update: " + departureCode);
 			}
 		}
 
@@ -106,6 +103,10 @@ public class Thermometer {
 
 	public ThermometerMetadata getMetadata() {
 		return metadata;
+	}
+
+	public void setListener(ThermometerListener listener) {
+		this.listener = listener;
 	}
 
 }

@@ -20,15 +20,15 @@ public class ThermometerMonitorTest {
 	private DayFrame dayFrame;
 	private ThermometerComparator comparator;
 	private ThermometerMonitor monitor;
-	private WeatherArchiver weatherArchiver;
+	private WeatherArchiverImpl weatherArchiver;
 	private HumanReadableLog hrLog;
 
 	@Before
 	public void setup() {
 		dayFrame = mock(DayFrame.class);
 		comparator = mock(ThermometerComparator.class);
-		weatherArchiver = mock(WeatherArchiver.class);
-		hrLog = mock(HumanReadableLog.class);
+		weatherArchiver = mock(WeatherArchiverImpl.class);
+		hrLog = mock(HumanReadableLogImpl.class);
 		monitor = new ThermometerMonitor(dayFrame,
 				new ThermometerComparator[] { comparator }, weatherArchiver,
 				hrLog);
