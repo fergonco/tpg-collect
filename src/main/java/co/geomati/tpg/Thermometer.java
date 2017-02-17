@@ -14,14 +14,18 @@ public class Thermometer {
 	private final static Logger logger = LogManager.getLogger(Thermometer.class);
 
 	private LinkedHashMap<String, Step> steps = new LinkedHashMap<String, Step>();
+	private ArrayList<Step> stepList;
 	private boolean done;
 	private ThermometerMetadata metadata;
 	private ThermometerListener listener;
+
+	private String destination;
 
 	public Thermometer(ArrayList<Step> steps) {
 		for (Step step : steps) {
 			this.steps.put(step.getDepartureCode(), step);
 		}
+		this.stepList = steps;
 	}
 
 	public boolean isDone() {
@@ -44,7 +48,14 @@ public class Thermometer {
 				if (updatedStep.getTimestamp() < now) {
 					if (plannedStep.getActualTimestamp() != updatedStep.getTimestamp()) {
 						plannedStep.setActualTimestamp(updatedStep.getTimestamp());
-						listener.stepActualTimestampChanged(plannedStep);
+						int index = stepList.indexOf(plannedStep);
+						Step previousStep;
+						if (index > 0) {
+							previousStep = stepList.get(index - 1);
+						} else {
+							previousStep = null;
+						}
+						listener.stepActualTimestampChanged(previousStep, plannedStep, destination);
 						effectiveUpdate = true;
 					}
 				}
@@ -107,6 +118,10 @@ public class Thermometer {
 
 	public void setListener(ThermometerListener listener) {
 		this.listener = listener;
+	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
 	}
 
 }

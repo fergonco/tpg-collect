@@ -1,9 +1,9 @@
 package co.geomati.tpg.utils;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
 
 import org.apache.commons.io.IOUtils;
@@ -27,20 +27,18 @@ public class TPG {
 	}
 
 	public String get(String command, String... params) throws IOException {
-		try {
-			String url = baseURL + command + "?key=" + key;
-			for (int i = 0; i < params.length; i++) {
-				url += "&" + params[i];
-			}
-			logger.debug(url);
-			String ret = IOUtils.toString(new URI(url),
-					Charset.forName("utf-8"));
-			logger.debug("ok");
-			logger.debug(ret);
-			return ret;
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("Bug: Malformed URI", e);
+		String url = baseURL + command + "?key=" + key;
+		for (int i = 0; i < params.length; i++) {
+			url += "&" + params[i];
 		}
+		logger.debug(url);
+		String ret;
+		BufferedInputStream bis = new BufferedInputStream(new URL(url).openStream());
+		ret = IOUtils.toString(bis, Charset.forName("utf-8"));
+		bis.close();
+		logger.debug("ok");
+		logger.debug(ret);
+		return ret;
 	}
 
 }

@@ -65,10 +65,17 @@ public class ThermometerComparator {
 		thermometerStarts = tpg.getStopDepartures(dayFrame.getCurrentDay(), line, firstStop, destination);
 		departureThermometer = new HashMap<String, Thermometer>();
 		for (ThermometerStart start : thermometerStarts) {
+			synchronized (this) {
+				try {
+					wait(400);
+				} catch (InterruptedException e) {
+				}
+			}
 			Thermometer thermometer = tpg.getThermometer(start.getDepartureCode());
 			thermometer.setMetadata(line, firstStop, destination);
 			if (listener != null) {
 				thermometer.setListener(listener);
+				thermometer.setDestination(destination);
 			}
 			departureThermometer.put(start.getDepartureCode(), thermometer);
 		}

@@ -34,18 +34,15 @@ public class XPathExaminer {
 
 	public XPathExaminer(String xmlContent) throws SAXException {
 		try {
-			doc = builder
-					.parse(new ByteArrayInputStream(xmlContent.getBytes()));
+			doc = builder.parse(new ByteArrayInputStream(xmlContent.getBytes()));
 		} catch (IOException e) {
-			throw new RuntimeException(
-					"IOException reading memory bytes, weird!", e);
+			throw new RuntimeException("IOException reading memory bytes, weird!", e);
 		}
 		XPathFactory xPathfactory = XPathFactory.newInstance();
 		xpath = xPathfactory.newXPath();
 	}
 
-	public String getAsString(String expression)
-			throws XPathExpressionException {
+	public String getAsString(String expression) throws XPathExpressionException {
 		return xpath.evaluate(expression, doc);
 	}
 
@@ -53,29 +50,27 @@ public class XPathExaminer {
 		return (Node) xpath.evaluate(expression, doc, XPathConstants.NODE);
 	}
 
-	public Double getAsDouble(String expression)
-			throws XPathExpressionException {
+	public Double getAsDouble(String expression) throws XPathExpressionException {
 		return (Double) xpath.evaluate(expression, doc, XPathConstants.NUMBER);
 	}
 
-	public NodeList getAsNodeset(Node root, String expression)
-			throws XPathExpressionException {
-		return (NodeList) xpath.evaluate(expression, root,
-				XPathConstants.NODESET);
+	public Double getAsDouble(Node root, String expression) throws XPathExpressionException {
+		return (Double) xpath.evaluate(expression, root, XPathConstants.NUMBER);
 	}
 
-	public NodeList getAsNodeset(String expression)
-			throws XPathExpressionException {
+	public NodeList getAsNodeset(Node root, String expression) throws XPathExpressionException {
+		return (NodeList) xpath.evaluate(expression, root, XPathConstants.NODESET);
+	}
+
+	public NodeList getAsNodeset(String expression) throws XPathExpressionException {
 		return getAsNodeset(doc, expression);
 	}
 
-	public Node getAsNode(Node item, String expression)
-			throws XPathExpressionException {
+	public Node getAsNode(Node item, String expression) throws XPathExpressionException {
 		return (Node) xpath.evaluate(expression, item, XPathConstants.NODE);
 	}
 
-	public String getAsString(Node item, String expression)
-			throws XPathExpressionException {
+	public String getAsString(Node item, String expression) throws XPathExpressionException {
 		return (String) xpath.evaluate(expression, item, XPathConstants.STRING);
 	}
 

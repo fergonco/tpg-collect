@@ -19,7 +19,7 @@ public class ThermometerMonitor {
 	 * enough to a) let thermometers stabilize when complete and b) don't make
 	 * more than 5000 calls a day
 	 */
-	private static final int CHECK_PAUSE = 10 * 60000;
+	private static final int CHECK_PAUSE = 5 * 60 * 1000;
 	private DayFrame dayFrame;
 	private ThermometerComparator[] thermometerComparators;
 	private WeatherArchiver weatherArchiver;
