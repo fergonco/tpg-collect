@@ -19,7 +19,7 @@ public class ThermometerMonitor {
 	 * enough to a) let thermometers stabilize when complete and b) don't make
 	 * more than 5000 calls a day
 	 */
-	private static final int CHECK_PAUSE = 5 * 60 * 1000;
+	private static final int CHECK_PAUSE = 10 * 60 * 1000;
 	private DayFrame dayFrame;
 	private ThermometerComparator[] thermometerComparators;
 	private WeatherArchiver weatherArchiver;
@@ -51,14 +51,10 @@ public class ThermometerMonitor {
 				working = false;
 			} else {
 				try {
-					if (!working) {
-						for (ThermometerComparator thermometerComparator : thermometerComparators) {
-							thermometerComparator.init();
-						}
-					}
 					working = true;
 					for (ThermometerComparator thermometerComparator : thermometerComparators) {
 						try {
+							thermometerComparator.init();
 							thermometerComparator.check();
 						} catch (RuntimeException e) {
 							logger.error("Error comparing thermometers", e);
@@ -89,7 +85,7 @@ public class ThermometerMonitor {
 	}
 
 	private void wakeMe(long checkPause) {
-		waitingTimer = new Timer(false);
+		waitingTimer = new Timer(true);
 		logger.debug("Waiting " + checkPause + " ms until the next wake up");
 		waitingTimer.schedule(new TimerTask() {
 

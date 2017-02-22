@@ -29,14 +29,11 @@ public class ThermometerMonitorTest {
 		comparator = mock(ThermometerComparator.class);
 		weatherArchiver = mock(WeatherArchiverImpl.class);
 		hrLog = mock(HumanReadableLogImpl.class);
-		monitor = new ThermometerMonitor(dayFrame,
-				new ThermometerComparator[] { comparator }, weatherArchiver,
-				hrLog);
+		monitor = new ThermometerMonitor(dayFrame, new ThermometerComparator[] { comparator }, weatherArchiver, hrLog);
 	}
 
 	@Test
-	public void testDayNotStarted() throws IOException, SAXException,
-			ParseException {
+	public void testDayNotStarted() throws IOException, SAXException, ParseException {
 
 		when(dayFrame.getCurrentDay()).thenReturn(null);
 		when(dayFrame.getWaitingMSUntilTomorrow()).thenReturn(10000L);
@@ -48,8 +45,7 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
-	public void testWeatherReport() throws IOException, SAXException,
-			ParseException {
+	public void testWeatherReport() throws IOException, SAXException, ParseException {
 
 		when(dayFrame.getCurrentDay()).thenReturn(null);
 		when(dayFrame.getWaitingMSUntilTomorrow()).thenReturn(10000L);
@@ -60,8 +56,7 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
-	public void testDayStarted() throws IOException, SAXException,
-			ParseException {
+	public void testDayStarted() throws IOException, SAXException, ParseException {
 		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));
 
 		monitor.monitor();
@@ -71,8 +66,7 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
-	public void retryInitIfFailure() throws IOException, SAXException,
-			ParseException {
+	public void retryInitIfFailure() throws IOException, SAXException, ParseException {
 		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));
 		doThrow(new NullPointerException()).doNothing().when(comparator).init();
 
@@ -84,20 +78,7 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
-	public void testDayAlreadyStarted() throws IOException, SAXException,
-			ParseException {
-		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));
-
-		monitor.monitor();
-		monitor.monitor();
-
-		verify(comparator, times(1)).init();
-		verify(comparator, times(2)).check();
-	}
-
-	@Test
-	public void testDayFinished() throws IOException, SAXException,
-			ParseException {
+	public void testDayFinished() throws IOException, SAXException, ParseException {
 		when(dayFrame.getCurrentDay()).thenReturn(new Date(0)).thenReturn(null);
 		when(dayFrame.getWaitingMSUntilTomorrow()).thenReturn(10000L);
 
@@ -111,14 +92,11 @@ public class ThermometerMonitorTest {
 	}
 
 	@Test
-	public void testFailInComparator() throws IOException, SAXException,
-			ParseException {
+	public void testFailInComparatorRaisesNoException() throws IOException, SAXException, ParseException {
 		when(dayFrame.getCurrentDay()).thenReturn(new Date(0));
 
 		doThrow(new RuntimeException()).when(comparator).check();
 
 		monitor.monitor();
-		monitor.monitor();
-		verify(comparator, times(1)).init();
 	}
 }

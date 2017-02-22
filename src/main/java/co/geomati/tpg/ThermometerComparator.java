@@ -62,22 +62,26 @@ public class ThermometerComparator {
 	 * @throws ParseException
 	 */
 	public void init() throws IOException, SAXException, ParseException {
-		thermometerStarts = tpg.getStopDepartures(dayFrame.getCurrentDay(), line, firstStop, destination);
-		departureThermometer = new HashMap<String, Thermometer>();
+		if (thermometerStarts == null) {
+			thermometerStarts = tpg.getStopDepartures(dayFrame.getCurrentDay(), line, firstStop, destination);
+		}
+		if (departureThermometer == null) {
+			departureThermometer = new HashMap<String, Thermometer>();
+		}
 		for (ThermometerStart start : thermometerStarts) {
-			synchronized (this) {
+			if (!departureThermometer.containsKey(start.getDepartureCode())) {
 				try {
-					wait(400);
-				} catch (InterruptedException e) {
+					Thermometer thermometer = tpg.getThermometer(start.getDepartureCode());
+					thermometer.setMetadata(line, firstStop, destination);
+					if (listener != null) {
+						thermometer.setListener(listener);
+						thermometer.setDestination(destination);
+					}
+					departureThermometer.put(start.getDepartureCode(), thermometer);
+				} catch (Exception e) {
+					logger.error("Error getting thermometer for departure " + start.getDepartureCode(), e);
 				}
 			}
-			Thermometer thermometer = tpg.getThermometer(start.getDepartureCode());
-			thermometer.setMetadata(line, firstStop, destination);
-			if (listener != null) {
-				thermometer.setListener(listener);
-				thermometer.setDestination(destination);
-			}
-			departureThermometer.put(start.getDepartureCode(), thermometer);
 		}
 	}
 
