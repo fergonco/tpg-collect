@@ -63,7 +63,9 @@ public class ThermometerComparator {
 	 */
 	public void init() throws IOException, SAXException, ParseException {
 		if (thermometerStarts == null) {
+			logger.debug("Initializing departures for line " + firstStop + "->" + destination);
 			thermometerStarts = tpg.getStopDepartures(dayFrame.getCurrentDay(), line, firstStop, destination);
+			logger.debug("Number of departures: " + thermometerStarts.length);
 		}
 		if (departureThermometer == null) {
 			departureThermometer = new HashMap<String, Thermometer>();
@@ -71,6 +73,8 @@ public class ThermometerComparator {
 		for (ThermometerStart start : thermometerStarts) {
 			if (!departureThermometer.containsKey(start.getDepartureCode())) {
 				try {
+					logger.debug("Getting thermometer for departure (" + start.getDepartureCode() + ") in " + firstStop
+							+ "->" + destination);
 					Thermometer thermometer = tpg.getThermometer(start.getDepartureCode());
 					thermometer.setMetadata(line, firstStop, destination);
 					if (listener != null) {
@@ -78,6 +82,7 @@ public class ThermometerComparator {
 						thermometer.setDestination(destination);
 					}
 					departureThermometer.put(start.getDepartureCode(), thermometer);
+					logger.debug("thermometer stored");
 				} catch (Exception e) {
 					logger.error("Error getting thermometer for departure " + start.getDepartureCode(), e);
 				}
@@ -98,11 +103,17 @@ public class ThermometerComparator {
 	}
 
 	public void check() {
+		logger.debug("Checking all thermometer starts");
 		for (ThermometerStart start : thermometerStarts) {
+			logger.debug("Checking " + start.getDepartureCode() + " at " + start.getTimestamp() + " in " + firstStop
+					+ "->" + destination);
 			long now = new Date().getTime();
+			logger.debug("Now: " + now);
 			if (start.getTimestamp() - now < FORWARD_IGNORING_THERMOMETER_THRESHOLD) {
+				logger.debug("Close enough");
 				Thermometer originalThermometer = departureThermometer.get(start.getDepartureCode());
 				if (!originalThermometer.isDone()) {
+					logger.debug("not yet done. Updating...");
 					Thermometer updatedThermometer = null;
 					try {
 						updatedThermometer = tpg.getThermometer(start.getDepartureCode());
@@ -114,9 +125,12 @@ public class ThermometerComparator {
 						logger.error("Cannot parse timestamp", e);
 					}
 
+					logger.debug("not yet done. Updating...");
 					if (updatedThermometer != null) {
 						boolean effectiveUpdate = originalThermometer.update(updatedThermometer);
+						logger.debug("updated");
 						if (originalThermometer.isComplete()) {
+							logger.debug("... and complete. Set to done");
 							if (!effectiveUpdate) {
 								originalThermometer.setDone(true);
 							}
@@ -127,8 +141,11 @@ public class ThermometerComparator {
 							}
 						}
 					}
+				} else {
+					logger.debug("thermometer is done");
 				}
-
+			} else {
+				logger.debug("Too far");
 			}
 		}
 

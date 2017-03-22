@@ -37,7 +37,6 @@ public class TPG {
 		ret = IOUtils.toString(bis, Charset.forName("utf-8"));
 		bis.close();
 		logger.debug("ok");
-		logger.debug(ret);
 		return ret;
 	}
 

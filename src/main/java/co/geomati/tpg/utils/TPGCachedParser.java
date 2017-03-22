@@ -84,27 +84,36 @@ public class TPGCachedParser {
 
 	public ThermometerStart[] getStopDepartures(Date today, String lineCode, String stopCode, String destinationCode)
 			throws IOException, SAXException, ParseException {
-		String xmlContent = tpgGet("GetAllNextDepartures.xml", "stopCode=" + stopCode, "lineCode=" + lineCode,
-				"destinationCode=" + destinationCode);
-
-		ArrayList<ThermometerStart> ret = new ArrayList<ThermometerStart>();
-
-		XPathExaminer examiner = new XPathExaminer(xmlContent);
 		try {
-			NodeList departureList = examiner.getAsNodeset("/nextDepartures/departures/departure");
-			for (int i = 0; i < departureList.getLength(); i++) {
-				Node departure = departureList.item(i);
+			NodeList departureList = null;
+			XPathExaminer examiner = null;
+			int i = 0;
+			while (i < numAttempts) {
+				String xmlContent = tpgGet("GetAllNextDepartures.xml", "stopCode=" + stopCode, "lineCode=" + lineCode,
+						"destinationCode=" + destinationCode);
+
+				examiner = new XPathExaminer(xmlContent);
+				departureList = examiner.getAsNodeset("/nextDepartures/departures/departure");
+				if (departureList.getLength() > 0) {
+					break;
+				} else {
+					i++;
+				}
+			}
+			ArrayList<ThermometerStart> ret = new ArrayList<ThermometerStart>();
+			for (int j = 0; j < departureList.getLength(); j++) {
+				Node departure = departureList.item(j);
 				ThermometerStart start = new ThermometerStart();
 				start = new ThermometerStart();
 				start.setDepartureCode(examiner.getAsString(departure, "departureCode"));
 				start.setTimestamp(new TimestampParser().getTime(examiner.getAsString(departure, "timestamp")));
 				ret.add(start);
 			}
+
+			return ret.toArray(new ThermometerStart[ret.size()]);
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException("All our xpath expressions are right, weird!", e);
 		}
-		return ret.toArray(new ThermometerStart[ret.size()]);
-
 	}
 
 }
