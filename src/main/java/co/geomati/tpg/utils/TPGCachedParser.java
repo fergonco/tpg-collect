@@ -7,6 +7,7 @@ import java.util.Date;
 
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
@@ -14,6 +15,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import co.geomati.tpg.Step;
+import co.geomati.tpg.Stop;
 import co.geomati.tpg.Thermometer;
 import co.geomati.tpg.ThermometerStart;
 
@@ -116,4 +118,61 @@ public class TPGCachedParser {
 		}
 	}
 
+	public Stop[] getStops(String lineCode) throws IOException, SAXException, ParseException {
+		try {
+			NodeList stopCodeList = null;
+			XPathExaminer examiner = null;
+			int i = 0;
+			while (i < numAttempts) {
+				String xmlContent = tpgGet("GetStops.xml", "lineCode=" + lineCode);
+
+				examiner = new XPathExaminer(xmlContent);
+				stopCodeList = examiner.getAsNodeset("/stops/stops/stop/stopCode");
+				if (stopCodeList.getLength() > 0) {
+					break;
+				} else {
+					i++;
+				}
+			}
+			ArrayList<String> stopCodes = new ArrayList<String>();
+			for (int j = 0; j < stopCodeList.getLength(); j++) {
+				stopCodes.add(stopCodeList.item(j).getTextContent());
+			}
+			return buildStopList(stopCodes);
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException("All our xpath expressions are right, weird!", e);
+		}
+	}
+
+	private Stop[] buildStopList(ArrayList<String> stopCodes) throws IOException, SAXException {
+		try {
+			NodeList stopList = null;
+			XPathExaminer examiner = null;
+			int i = 0;
+			while (i < numAttempts) {
+				String xmlContent = tpgGet("GetPhysicalStops.xml", "stopCode=" + StringUtils.join(stopCodes, ","));
+
+				examiner = new XPathExaminer(xmlContent);
+				stopList = examiner.getAsNodeset("/stops/stops/stop");
+				if (stopList.getLength() > 0) {
+					break;
+				} else {
+					i++;
+				}
+			}
+			ArrayList<Stop> ret = new ArrayList<Stop>();
+			for (int j = 0; j < stopList.getLength(); j++) {
+				Node stopNode = stopList.item(j);
+				String stopCode = examiner.getAsString(stopNode, "stopCode");
+				Node coordinates = examiner.getAsNode(stopNode, "physicalStops/physicalStop/coordinates");
+				Double latitude = examiner.getAsDouble(coordinates, "latitude");
+				Double longitude = examiner.getAsDouble(coordinates, "longitude");
+				Stop stop = new Stop(stopCode, latitude, longitude);
+				ret.add(stop);
+			}
+			return ret.toArray(new Stop[ret.size()]);
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException("All our xpath expressions are right, weird!", e);
+		}
+	}
 }
