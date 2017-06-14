@@ -18,6 +18,7 @@ public class Thermometer {
 	private boolean done;
 	private ThermometerMetadata metadata;
 	private ThermometerListener listener;
+	private String line;
 
 	private String destination;
 
@@ -55,7 +56,7 @@ public class Thermometer {
 						} else {
 							previousStep = null;
 						}
-						listener.stepActualTimestampChanged(previousStep, plannedStep, destination);
+						listener.stepActualTimestampChanged(previousStep, plannedStep, line, destination);
 						effectiveUpdate = true;
 					}
 				}
@@ -124,4 +125,7 @@ public class Thermometer {
 		this.destination = destination;
 	}
 
+	public void setLine(String line) {
+		this.line = line;
+	}
 }

@@ -80,6 +80,7 @@ public class ThermometerComparator {
 					if (listener != null) {
 						thermometer.setListener(listener);
 						thermometer.setDestination(destination);
+						thermometer.setLine(line);
 					}
 					departureThermometer.put(start.getDepartureCode(), thermometer);
 					logger.debug("thermometer stored");
@@ -125,7 +126,6 @@ public class ThermometerComparator {
 						logger.error("Cannot parse timestamp", e);
 					}
 
-					logger.debug("not yet done. Updating...");
 					if (updatedThermometer != null) {
 						boolean effectiveUpdate = originalThermometer.update(updatedThermometer);
 						logger.debug("updated");

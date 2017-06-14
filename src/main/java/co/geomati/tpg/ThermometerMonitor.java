@@ -97,7 +97,9 @@ public class ThermometerMonitor {
 	}
 
 	public void stop() {
-		waitingTimer.cancel();
+		if (waitingTimer != null) {
+			waitingTimer.cancel();
+		}
 	}
 
 }
